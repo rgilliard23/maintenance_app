@@ -3,7 +3,6 @@
   <div>
     <create-client :modal="modal" v-on:close="showModal" />
     <div class="fab" v-on:click="showModal"></div>
-    <Toast />
   </div>
 </template>
 

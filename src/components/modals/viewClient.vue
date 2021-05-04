@@ -1,72 +1,99 @@
 <template>
-  <div>
+  <div class="scroll">
     <Sidebar
       v-bind:visible="visible"
       :baseZIndex="5"
       position="full"
       v-on:update:visible="$emit('closeViewClient', $event)"
     >
-      <div>
-        <h2 class="center">Client Information</h2>
-        <div class="p-grid">
-          <div class="p-col">
-            <div class="p-d-flex p-flex-column p-ai-center">
-              <Avatar icon="pi pi-user" size="xlarge" />
-              <h2 class="p-my-4">
-                {{ client.firstName + " " + client.lastName }}
-              </h2>
-              <div class="p-mb-4">
-                <Chip :label="client.selectedMaintenancePlan.name" />
-              </div>
-              <div class="p-d-flex p-flex-md-row">
-                <Button
-                  label="Send Email"
-                  class="p-button-raised p-button-rounded p-mr-2"
-                />
-                <Button
-                  label="Send Report "
-                  class="p-button-raised p-button-rounded p-ml-2"
-                />
-              </div>
+      <h2 class="center">Client Information</h2>
+      <div class="p-grid">
+        <div class="p-col">
+          <div class="p-d-flex p-flex-column p-ai-center">
+            <Avatar icon="pi pi-user" size="xlarge" />
+            <h2 class="p-my-4">
+              {{ client.firstName + " " + client.lastName }}
+            </h2>
+            <div class="p-mb-4">
+              <Chip :label="client.selectedMaintenancePlan.name" />
             </div>
-          </div>
-          <div class="p-col">
-            <div class="p-d-flex p-flex-row p-ai-center p-mr-2">
-              <h4>Open Tasks: {{ client.tasks.length }}</h4>
+            <div class="p-d-flex p-flex-md-row">
               <Button
-                label="Create Task"
-                @click="showCreateTask"
-                class="p-button-raised p-button-rounded p-mx-4 p-my-4"
+                label="Send Email"
+                class="p-button-raised p-button-rounded p-mr-2"
               />
               <Button
-                label="View All Tasks"
-                class="p-button-raised p-button-rounded p-mx-4 p-my-4"
+                label="Send Report "
+                class="p-button-raised p-button-rounded p-ml-2"
               />
-            </div>
-            <hr />
-            <h4>Personal Info</h4>
-            <div class="p-d-flex p-flex-row p-jc-start">
-              <h4>Email: {{ client.email }}</h4>
-              <h4 class="p-ml-4">Phone Number: {{ client.phoneNumber }}</h4>
             </div>
           </div>
         </div>
-
-        <hr />
-        <h4>Tasks</h4>
-        <create-task :visible="createTask" v-on:close="closeCreateTask" />
+        <div class="p-col">
+          <div class="p-d-flex p-flex-row p-ai-center p-mr-2">
+            <h4>Open Tasks: {{ client.openTasks }}</h4>
+            <Button
+              label="Create Task"
+              @click="showCreateTask"
+              class="p-button-raised p-button-rounded p-mx-4 p-my-4"
+            />
+            <Button
+              label="View All Tasks"
+              @click="showViewTasks"
+              class="p-button-raised p-button-rounded p-mx-4 p-my-4"
+            />
+          </div>
+          <hr />
+          <h4>Personal Info</h4>
+          <div class="p-d-flex p-flex-row p-jc-start">
+            <h4>Email: {{ client.email }}</h4>
+            <h4 class="p-ml-4">Phone Number: {{ client.phoneNumber }}</h4>
+          </div>
+        </div>
       </div>
+
+      <hr />
+      <h4>Tasks</h4>
+      <div class="calendar">
+        <FullCalendar :events="events" :options="options" />
+      </div>
+
+      <ViewAllTasks
+        :visible="viewTasks"
+        :tasks="tasks"
+        v-on:closeViewTasks="closeViewTasks"
+      />
+      <ViewTask :visible="viewTask" :task="taskModel" />
+      <create-task
+        :visible="createTask"
+        :client="client"
+        v-on:close="closeCreateTask"
+      />
     </Sidebar>
   </div>
 </template>
 
 <script>
 import { ref } from "@vue/reactivity";
+import "@fullcalendar/core";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { onMounted } from "@vue/runtime-core";
+import { FilterMatchMode, FilterOperator } from "primevue/api";
+import { useStore } from "vuex";
+import moment from "moment";
+
+//* Components
 import CreateTask from "../modals/createTask";
+import ViewAllTasks from "../modals/viewAllTasks";
+import ViewTask from "../modals/viewTask";
 
 export default {
   components: {
     CreateTask,
+    ViewAllTasks,
+    ViewTask,
   },
   props: {
     visible: {
@@ -77,7 +104,47 @@ export default {
     },
   },
   setup() {
+    let store = useStore();
     let createTask = ref(false);
+    let tasksLoading = ref(true);
+    let viewTask = ref(false);
+    let taskModel = ref({});
+    let viewTasks = ref(false);
+    let tasks = ref([]);
+    let events = ref([]);
+    const options = ref({
+      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+      initialDate: Date.now(),
+      headerToolbar: {
+        left: "prev,next",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
+      },
+      editable: true,
+      eventClick: (e) => {
+        taskModel = e.event.extendedProps.task;
+        viewTask.value = true;
+      },
+    });
+
+    onMounted(async () => {
+      await store.dispatch("getTasks");
+      tasks.value = store.getters.tasks;
+      console.log(tasks.value);
+      tasksLoading.value = false;
+      events.value = tasks.value.map((task) => {
+        return {
+          title: task.header,
+          start: moment
+            .utc(new Date(task.dateCreated.seconds * 1000))
+            .valueOf(),
+          end: moment.utc(new Date(task.dateDue.seconds * 1000)).valueOf(),
+          extendedProps: {
+            task: task,
+          },
+        };
+      });
+    });
 
     const showCreateTask = () => {
       createTask.value = true;
@@ -87,13 +154,89 @@ export default {
       createTask.value = false;
     };
 
-    return { createTask, showCreateTask, closeCreateTask };
+    const showViewTasks = () => {
+      viewTasks.value = true;
+    };
+
+    const closeViewTasks = () => {
+      viewTasks.value = false;
+    };
+
+    const taskFilter = ref({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      header: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      description: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      dateDue: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+      },
+      status: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }],
+      },
+    });
+
+    const clearFilter = () => {
+      taskFilter.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        header: {
+          operator: FilterOperator.AND,
+          constraints: [
+            { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+          ],
+        },
+        description: {
+          operator: FilterOperator.AND,
+          constraints: [
+            { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+          ],
+        },
+        dateDue: {
+          operator: FilterOperator.AND,
+          constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+        },
+        status: {
+          operator: FilterOperator.AND,
+          constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }],
+        },
+      };
+    };
+    return {
+      createTask,
+      showCreateTask,
+      closeCreateTask,
+      showViewTasks,
+      closeViewTasks,
+      tasks,
+      taskFilter,
+      clearFilter,
+      tasksLoading,
+      viewTasks,
+      events,
+      options,
+      taskModel,
+      viewTask,
+    };
   },
 };
 </script>
 
 <style scoped>
-.center {
-  margin: 0 auto;
+@media screen and (max-width: 960px) {
+  ::v-deep(.fc-header-toolbar) {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+.calendar {
+  overflow-y: scroll;
+  height: 60vh;
+  padding: 0 15vw;
 }
 </style>

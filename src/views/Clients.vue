@@ -8,13 +8,21 @@
     >
       <template #header>
         <div class="p-d-flex p-jc-between">
-          <Button
-            type="button"
-            icon="pi pi-filter-slash"
-            label="Clear"
-            class="p-button-outlined"
-            @click="clearFilter1()"
-          />
+          <div class="p-d-flex p-ai-center">
+            <Button
+              icon="pi pi-refresh"
+              @click="refresh"
+              class="p-button-outlined p-button-rounded p-mx-2"
+            />
+            <Button
+              type="button"
+              icon="pi pi-filter-slash"
+              label="Clear"
+              class="p-button-outlined"
+              @click="clearFilter1()"
+            />
+          </div>
+
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
             <InputText
@@ -24,13 +32,6 @@
           </span>
         </div>
       </template>
-      <!-- <Column
-        v-for="col of cols"
-        :field="col.field"
-        :header="col.header"
-        :key="col.field"
-        sortable="true"
-      ></Column> -->
       <Column field="firstName" header="First Name">
         <template #body="{ data }">
           {{ data.firstName }}
@@ -101,7 +102,7 @@ export default {
   components: { ViewClient },
   setup() {
     const store = useStore();
-    let client = ref({});
+    let client = ref(store.getters.client);
     let viewClient = ref(false);
     let clients = ref([]);
     let cols = ref([
@@ -110,6 +111,7 @@ export default {
       { field: "email", header: "Email" },
     ]);
     const loading = ref(true);
+
     onBeforeMount(() => {
       clients.value = store.state.clients;
       loading.value = false;
@@ -118,16 +120,18 @@ export default {
     const showViewClient = (data) => {
       viewClient.value = true;
       client.value = data;
+      store.commit("setClient", data);
     };
 
+    const refresh = async () => {
+      await store.dispatch("getClients");
+      clients.value = store.getters.clients;
+    };
     const closeEdit = () => {
       viewClient.value = false;
     };
 
     const clearFilter1 = () => {
-      initFilters1();
-    };
-    const initFilters1 = () => {
       filters1.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         firstName: {
@@ -175,6 +179,7 @@ export default {
       closeEdit,
       filters1,
       clearFilter1,
+      refresh,
     };
   },
 };

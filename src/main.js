@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
@@ -24,6 +24,11 @@ import Textarea from 'primevue/textarea';
 import Calendar from 'primevue/calendar'
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
+import InputNumber from 'primevue/inputnumber';
+import InputSwitch from 'primevue/inputswitch';
+import Badge from 'primevue/badge';
+import FullCalendar from 'primevue/fullcalendar';
+
 
 
 
@@ -61,5 +66,9 @@ app.component('Chip', Chip)
 app.component('Textarea', Textarea)
 app.component('Calendar', Calendar)
 app.component('Toast', Toast)
+app.component('InputNumber', InputNumber)
+app.component('InputSwitch', InputSwitch)
+app.component('Badge', Badge)
+app.component('FullCalendar', FullCalendar)
 app.mount("#app");
 

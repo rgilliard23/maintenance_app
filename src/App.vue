@@ -8,20 +8,22 @@
 import { onBeforeMount } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import firebase from "firebase/app";
+import { useStore } from "vuex";
 // import NotificationList from "./components/NotificationList.vue";
 
 export default {
-  // components: {
-  //   NotificationList,
-  // },
   setup() {
     const router = useRouter();
     const route = useRoute();
+    const store = useStore();
     onBeforeMount(() => {
       firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
           router.replace("/login");
         } else if (route.path === "/login" || route.path == "/register") {
+          console.log(user);
+          store.commit("setUser", user);
+          console.log(user);
           router.replace("/");
           // JZ9MORRDpjlikz3Tzp81sTSmMNkpTaII
         }

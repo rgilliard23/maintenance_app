@@ -13,20 +13,37 @@
       </template>
       <div class="p-fluid">
         <div class="p-field">
-          <label for="firstname">Header</label>
-          <InputText id="firstname" v-model="firstName" type="text" />
+          <label class="my-4" for="firstname">Header</label>
+          <InputText id="firstname" v-model="header" type="text" />
         </div>
         <div class="p-field">
-          <label for="lastname">Description</label>
+          <label class="my-4" for="lastname">Description</label>
           <Textarea v-model="description" rows="5" cols="30" />
         </div>
-        <label for="calendar">Due Date</label>
-        <Calendar
-          label="Due Date"
-          :inline="true"
-          v-model="dateDue"
-          :showWeek="true"
-        />
+        <div class="p-field">
+          <label class="my-4" for="calendar">Due Date</label>
+          <Calendar
+            label="Due Date"
+            :showTime="true"
+            hourFormat="12"
+            v-model="dateDue"
+            yearNavigator="true"
+            monthNavigator="true"
+            :showWeek="true"
+          />
+        </div>
+
+        <div class="my-4 p-field">
+          <label for="timeEstimated">Time To Complete</label>
+          <InputNumber
+            suffix="min"
+            v-model="timeToComplete"
+            showButtons
+            name="timeToComplete"
+            step="15"
+            id="timeToComplete"
+          />
+        </div>
       </div>
       <template #footer>
         <Button
@@ -38,21 +55,28 @@
         <Button
           label="Create Task"
           icon="pi pi-check"
-          @click="createClient"
+          @click="createTask"
           autofocus
         />
       </template>
     </Dialog>
+    <Toast :baseZIndex="50" />
   </div>
 </template>
 
 <script>
 import { useStore } from "vuex";
 import { ref } from "@vue/reactivity";
+import firebase from "firebase/app";
+import { useToast } from "primevue/usetoast";
 
 export default {
   props: {
     visible: {
+      required: true,
+      type: Boolean,
+    },
+    client: {
       required: true,
       type: Boolean,
     },
@@ -62,6 +86,8 @@ export default {
     let header = ref("");
     let description = ref("");
     let dateDue = ref(null);
+    let timeToComplete = ref(0);
+    const toast = useToast();
 
     const close = () => {
       emit("close");
@@ -72,8 +98,31 @@ export default {
         header: header.value,
         description: description.value,
         dateDue: dateDue.value,
+        dateCreated: firebase.firestore.Timestamp.now(),
+        dateCompleted: null,
+        timeToComplete: timeToComplete.value,
+        status: "open",
+        user: store.getters.user.uid,
+        client: props.client.id,
       };
-      store.dispatch("createTask", task);
+
+      store
+        .dispatch("createTask", task)
+        .then(() => {
+          toast.add({
+            severity: "success",
+            summary: "Successfully Created Task",
+            life: 3000,
+          });
+        })
+        .catch((err) => {
+          toast.add({
+            severity: "warning",
+            summary: "Cannot Create Task",
+            detail: err,
+            life: 3000,
+          });
+        });
       close();
     };
 
@@ -83,6 +132,7 @@ export default {
       description,
       dateDue,
       createTask,
+      timeToComplete,
     };
   },
 };

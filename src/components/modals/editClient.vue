@@ -53,7 +53,6 @@
 
 <script>
 import { ref } from "@vue/reactivity";
-// import { ref } from "@vue/reactivity";
 
 export default {
   props: {

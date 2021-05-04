@@ -37,6 +37,10 @@
             placeholder="Select a Maintenance Plan"
           />
         </div>
+        <div>
+          <h5 for="active">Active</h5>
+          <InputSwitch v-model="active" />
+        </div>
       </div>
       <template #footer>
         <Button
@@ -53,6 +57,7 @@
         />
       </template>
     </Dialog>
+    <Toast />
   </div>
 </template>
 
@@ -77,6 +82,7 @@ export default defineComponent({
     let phoneNumber = ref("");
     let firstName = ref("");
     let lastName = ref("");
+    let active = ref(true);
     let maintenancePlans = [
       { name: "Maintenance Basic", hoursLeft: 120 * 60 },
       { name: "Maintenance Elite", hoursLeft: 180 * 60 },
@@ -99,7 +105,9 @@ export default defineComponent({
         email: email.value,
         phoneNumber: phoneNumber.value,
         selectedMaintenancePlan: selectedMaintenancePlan.value,
-        tasks: [],
+        openTasks: 0,
+        active: active.value,
+        user: store.getters.user.uid,
       };
 
       store
@@ -131,6 +139,7 @@ export default defineComponent({
       firstName,
       lastName,
       phoneNumber,
+      active,
     };
   },
 });
