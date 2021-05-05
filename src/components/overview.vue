@@ -1,15 +1,18 @@
 <template>
   <div class="overview">
+    <SendReport />
     <Fab class="fab" />
   </div>
 </template>
 
 <script>
 import Fab from "../components/widgets/fab";
+import SendReport from "../components/modals/sendReport";
 export default {
   name: "Overview",
   components: {
     Fab,
+    SendReport,
   },
 };
 </script>

@@ -28,6 +28,11 @@ import InputNumber from 'primevue/inputnumber';
 import InputSwitch from 'primevue/inputswitch';
 import Badge from 'primevue/badge';
 import FullCalendar from 'primevue/fullcalendar';
+import Chips from 'primevue/chips';
+
+
+//* Text Editor Import
+import CKEditor from '@ckeditor/ckeditor5-vue';
 
 
 
@@ -52,6 +57,7 @@ app.use(store);
 app.use(router);
 app.use(PrimeVue);
 app.use(ToastService);
+app.use(CKEditor)
 
 app.component("InputText", InputText);
 app.component("Button", Button);
@@ -70,5 +76,7 @@ app.component('InputNumber', InputNumber)
 app.component('InputSwitch', InputSwitch)
 app.component('Badge', Badge)
 app.component('FullCalendar', FullCalendar)
+app.component('Chips', Chips)
+
 app.mount("#app");
 

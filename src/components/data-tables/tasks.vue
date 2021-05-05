@@ -69,7 +69,7 @@
           <Button
             icon="pi pi-eye"
             class="p-button-rounded p-button-success p-mr-2"
-            @click="showTaskDetails(slotProps.data)"
+            @click="showTask(slotProps.data)"
           />
           <Button
             icon="pi pi-trash"
@@ -80,6 +80,7 @@
       </Column>
       <template #empty> No Tasks Found. </template>
     </DataTable>
+    <ViewTask :visible="viewTask" :task="task" v-on:close="closeViewTask" />
   </div>
 </template>
 
@@ -88,7 +89,11 @@ import { ref } from "@vue/reactivity";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import moment from "moment";
 
+//* components
+import ViewTask from "../modals/viewTask";
+
 export default {
+  components: { ViewTask },
   props: {
     tasks: {
       required: true,
@@ -97,7 +102,16 @@ export default {
 
   setup() {
     let tasksLoading = ref(true);
+    let task = ref();
+    let viewTask = ref(false);
+    const showTask = (data) => {
+      task.value = data;
+      viewTask.value = true;
+    };
 
+    const closeViewTask = () => {
+      viewTask.value = false;
+    };
     const taskFilter = ref({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       header: {
@@ -149,6 +163,10 @@ export default {
       taskFilter,
       clearFilter,
       moment,
+      showTask,
+      task,
+      viewTask,
+      closeViewTask,
     };
   },
 };

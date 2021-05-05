@@ -20,10 +20,12 @@
             <div class="p-d-flex p-flex-md-row">
               <Button
                 label="Send Email"
+                @click="viewSendEmail"
                 class="p-button-raised p-button-rounded p-mr-2"
               />
               <Button
                 label="Send Report "
+                @click="viewSendReport"
                 class="p-button-raised p-button-rounded p-ml-2"
               />
             </div>
@@ -63,12 +65,18 @@
         :tasks="tasks"
         v-on:closeViewTasks="closeViewTasks"
       />
-      <ViewTask :visible="viewTask" :task="taskModel" />
+      <ViewTask
+        v-on:close="closeViewTask"
+        :visible="viewTask"
+        :task="taskModel"
+      />
       <create-task
         :visible="createTask"
         :client="client"
         v-on:close="closeCreateTask"
       />
+      <SendEmail :visible="viewEmail" v-on:close="closeSendEmail" />
+      <SendReport :visible="viewReport" v-on:close="closeSendReport" />
     </Sidebar>
   </div>
 </template>
@@ -88,12 +96,16 @@ import moment from "moment";
 import CreateTask from "../modals/createTask";
 import ViewAllTasks from "../modals/viewAllTasks";
 import ViewTask from "../modals/viewTask";
+import SendReport from "../modals/sendReport";
+import SendEmail from "../modals/sendEmail";
 
 export default {
   components: {
     CreateTask,
     ViewAllTasks,
     ViewTask,
+    SendReport,
+    SendEmail,
   },
   props: {
     visible: {
@@ -112,6 +124,9 @@ export default {
     let viewTasks = ref(false);
     let tasks = ref([]);
     let events = ref([]);
+    let viewReport = ref(false);
+    let viewEmail = ref(false);
+
     const options = ref({
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
       initialDate: Date.now(),
@@ -122,7 +137,7 @@ export default {
       },
       editable: true,
       eventClick: (e) => {
-        taskModel = e.event.extendedProps.task;
+        taskModel.value = e.event.extendedProps.task;
         viewTask.value = true;
       },
     });
@@ -160,6 +175,25 @@ export default {
 
     const closeViewTasks = () => {
       viewTasks.value = false;
+    };
+    const closeViewTask = () => {
+      viewTask.value = false;
+    };
+
+    const viewSendReport = () => {
+      viewReport.value = true;
+    };
+
+    const closeSendReport = () => {
+      viewReport.value = false;
+    };
+
+    const viewSendEmail = () => {
+      viewEmail.value = true;
+    };
+
+    const closeSendEmail = () => {
+      viewEmail.value = false;
     };
 
     const taskFilter = ref({
@@ -222,6 +256,13 @@ export default {
       options,
       taskModel,
       viewTask,
+      closeViewTask,
+      closeSendReport,
+      viewSendReport,
+      viewReport,
+      viewSendEmail,
+      closeSendEmail,
+      viewEmail,
     };
   },
 };
