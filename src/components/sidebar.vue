@@ -1,7 +1,10 @@
 <template>
   <div class="sidebar">
-    <h3 class="title">Simple Sidebar</h3>
+    <h3 class="title">Ronalds 426 Project</h3>
     <div class="menu-items">
+      <div class="p-d-flex p-jc-center">
+        <i class="pi pi-sun p-mr-2"></i> {{ temperature }}
+      </div>
       <router-link
         to="/"
         @click="showComponent('Home')"
@@ -29,6 +32,7 @@
       >
         <div class="link-container">Profile</div>
       </router-link>
+      <InputSwitch class="p-mx-auto" v-model="darkMode" />
       <div class="side-btn" v-on:click="Logout">
         <div class="link-container">Logout</div>
       </div>
@@ -39,11 +43,15 @@
 <script>
 import firebase from "firebase/app";
 import { useStore } from "vuex";
+import { ref } from "@vue/reactivity";
+import { onMounted } from "@vue/runtime-core";
+import axios from "axios";
 
 export default {
   setup() {
     const store = useStore();
-
+    let darkMode = ref(false);
+    let temperature = ref();
     const Logout = () => {
       firebase
         .auth()
@@ -52,10 +60,36 @@ export default {
         .catch((err) => alert(err));
     };
 
+    onMounted(async () => {
+      // const url =
+      //   "api.openweathermap.org/data/2.5/weather?q=chapelhill,uk&appid={API key}";
+
+      await axios
+        .get(
+          "http://api.openweathermap.org/data/2.5/weather?id=4460162&units=imperial&appid=d82afbee767f9b4274603ec0cc3ca7bd"
+        )
+        .then(async (res) => {
+          let data = await res.data;
+          temperature.value = data.main.temp;
+          console.log(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      // const resp = await fetch(
+      //   "api.openweathermap.org/data/2.5/weather?q=London,uk&appid=d82afbee767f9b4274603ec0cc3ca7bd"
+      // ).catch((err) => alert(err));
+
+      // const data = await resp.json();
+
+      // temperature.value = data.main.temp;
+    });
+
     const showComponent = (currentComponent) => {
       store.commit("setCurrentComponent", currentComponent);
     };
-    return { Logout, showComponent };
+    return { Logout, showComponent, darkMode, temperature };
   },
 };
 </script>

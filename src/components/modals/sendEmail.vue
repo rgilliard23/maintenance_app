@@ -14,7 +14,20 @@
       <div class="p-fluid">
         <div class="p-inputgroup">
           <span class="p-inputgroup-addon">To:</span>
-          <Chips v-model="emailRecipient" />
+          <!-- <Chips v-model="emailRecipient" /> -->
+          <InputText
+            v-model="emailRecipient"
+            type="text"
+            placeholder="email@email.com"
+          />
+        </div>
+        <div class="p-inputgroup p-md-4">
+          <span class="p-inputgroup-addon">Email Template</span>
+          <Dropdown
+            v-model="templateID"
+            :options="userProfile.emailTemplateIds"
+            optionLabel="name"
+          />
         </div>
         <div class="p-col-12 p-md-4">
           <div class="p-inputgroup">
@@ -25,11 +38,11 @@
         <div class="p-col-12 p-md-4">
           <div class="p-inputgroup">
             <span class="p-inputgroup-addon">Message:</span>
-            <TextArea
+            <Textarea
               placeholder="Subject"
-              v-model="subject"
+              v-model="message"
               rows="5"
-              columns="30"
+              cols="30"
             />
           </div>
         </div>
@@ -49,14 +62,19 @@
           autofocus
         />
       </template>
+      <Toast />
     </Dialog>
   </div>
 </template>
 
 <script>
 import { ref } from "@vue/reactivity";
+import { useStore } from "vuex";
+import { defineComponent, computed } from "vue";
+import { useToast } from "primevue/usetoast";
+import emailjs from "emailjs-com";
 
-export default {
+export default defineComponent({
   props: {
     visible: {
       required: true,
@@ -64,6 +82,10 @@ export default {
   },
 
   setup(props, { emit }) {
+    const store = useStore();
+    const toast = useToast();
+    let userProfile = computed(() => store.getters.userProfile);
+    let templateID = ref();
     let emailRecipient = ref();
     let subject = ref();
     let message = ref();
@@ -72,9 +94,60 @@ export default {
       emit("close");
     };
 
-    const sendEmail = () => {};
+    const sendEmail = () => {
+      console.log(emailRecipient.value);
 
-    return { close, sendEmail, subject, emailRecipient, message };
+      let template = templateID.value;
+      let obj = {
+        templateID: template.templateID,
+        emailParams: {
+          to_email: emailRecipient.value,
+          subject: subject.value,
+          message: message.value,
+        },
+      };
+      const serviceID = "default_service";
+      const templateID = "template_71hrmsy";
+      // let userID = userProfile.value.emailUserID;
+      // let serviceID = userProfile.value.serviceID;
+      emailjs
+        .send(serviceID, templateID, obj.emailParams)
+        .then(() => {
+          toast.add({
+            severity: "success",
+            summary: "Successfully Sent Email",
+            life: 3000,
+          });
+        })
+        .catch((err) => {
+          toast.add({
+            severity: "error",
+            summary: "There Was A Problem Sending Email",
+            detail: err,
+            life: 3000,
+          });
+        });
+      // store
+      //   .dispatch("sendEmail", obj)
+      //   .then(() => {
+      //
+      //   })
+      //   .catch((err) => {
+      //
+      //   });
+
+      close();
+    };
+
+    return {
+      close,
+      sendEmail,
+      subject,
+      emailRecipient,
+      message,
+      userProfile,
+      templateID,
+    };
   },
-};
+});
 </script>

@@ -1,18 +1,33 @@
 <template>
   <div class="login">
     <h1 class="title">Login</h1>
-    <div class="card">
-      <label for="dynamic-label-input">Enter some text</label>
-      <form @submit.prevent="Login">
-        <input type="text" placeholder="Username" v-model="email" />
-        <input type="text" placeholder="Password" v-model="password" />
-        <input type="submit" value="Login" />
-        <p>
-          Need An Account?
-          <router-link to="/register">Register Here</router-link>
-        </p>
-      </form>
-    </div>
+    <Card>
+      <template #content>
+        <form @submit.prevent="Login">
+          <div class="p-field">
+            <div class="p-d-flex p-px-4">
+              <div class="p-mx-2">
+                <h5>Email</h5>
+                <InputText v-model="email" placeholder="Email" />
+              </div>
+              <div class="p-mx-2">
+                <h5>Password</h5>
+                <Password
+                  v-model="password"
+                  placeholder="Password"
+                  toggleMask
+                />
+              </div>
+            </div>
+          </div>
+          <Button label="Login" type="submit" />
+          <p>
+            Need An Account?
+            <router-link to="/register">Register Here</router-link>
+          </p>
+        </form>
+      </template>
+    </Card>
   </div>
 </template>
 
@@ -44,9 +59,10 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  background: #00e0f0;
 }
 .title {
-  color: #838383;
+  color: white;
 }
 
 .input {

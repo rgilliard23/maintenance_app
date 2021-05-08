@@ -90,6 +90,8 @@
       :client="client"
       v-on:closeViewClient="closeEdit"
     />
+    <ConfirmDialog />
+    <Toast />
   </div>
 </template>
 
@@ -98,10 +100,17 @@ import { ref, onBeforeMount } from "vue";
 import { useStore } from "vuex";
 import ViewClient from "../components/modals/viewClient.vue";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
-export default {
+import { defineComponent } from "vue";
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+
+export default defineComponent({
   components: { ViewClient },
   setup() {
     const store = useStore();
+    const confirm = useConfirm();
+    const toast = useToast();
+
     let client = ref(store.getters.client);
     let viewClient = ref(false);
     let clients = ref([]);
@@ -129,6 +138,26 @@ export default {
     };
     const closeEdit = () => {
       viewClient.value = false;
+    };
+
+    const confirmDeleteProduct = (data) => {
+      confirm.require({
+        message: "Are you sure you want to delete client?",
+        header: "Confirmation",
+        icon: "pi pi-exclamation-triangle",
+        accept: () => {
+          store.dispatch("deleteClient", data.id).then(() => {
+            toast.add({
+              severity: "success",
+              summary: "Client Deleted",
+              life: 3000,
+            });
+          });
+        },
+        reject: () => {
+          alert("foehrgoe");
+        },
+      });
     };
 
     const clearFilter1 = () => {
@@ -180,9 +209,10 @@ export default {
       filters1,
       clearFilter1,
       refresh,
+      confirmDeleteProduct,
     };
   },
-};
+});
 </script>
 */ //
 <style scoped></style>

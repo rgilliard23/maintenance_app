@@ -2,7 +2,13 @@
   <!-- Add Tool Tip -->
   <div>
     <create-client :modal="modal" v-on:close="showModal" />
-    <div class="fab" v-on:click="showModal"></div>
+    <Button
+      icon="pi pi-plus"
+      v-on:click="showModal"
+      size="xl"
+      class="p-button-rounded p-button-secondary"
+    />
+    <!-- <div class="fab"></div> -->
   </div>
 </template>
 
@@ -67,15 +73,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.fab {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  width: 60px;
-  background-color: #2affde;
-  border-radius: 30px;
-}
-</style>
+<style scoped></style>

@@ -13,7 +13,8 @@ import Dropdown from 'primevue/dropdown';
 import InputMask from 'primevue/inputmask';
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import "primevue/resources/themes/saga-blue/theme.css";
+import "primevue/resources/themes/md-dark-indigo/theme.css"
+import "primevue/resources/themes/md-light-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import 'primeicons/primeicons.css'
 import Sidebar from 'primevue/sidebar';
@@ -29,10 +30,17 @@ import InputSwitch from 'primevue/inputswitch';
 import Badge from 'primevue/badge';
 import FullCalendar from 'primevue/fullcalendar';
 import Chips from 'primevue/chips';
+import ConfirmationService from 'primevue/confirmationservice';
+import ConfirmDialog from 'primevue/confirmdialog';
+import Password from 'primevue/password';
+import Card from 'primevue/card';
+import Listbox from 'primevue/listbox';
 
 
 //* Text Editor Import
 import CKEditor from '@ckeditor/ckeditor5-vue';
+
+//* Email JS
 
 
 
@@ -58,6 +66,8 @@ app.use(router);
 app.use(PrimeVue);
 app.use(ToastService);
 app.use(CKEditor)
+app.use(ConfirmationService)
+
 
 app.component("InputText", InputText);
 app.component("Button", Button);
@@ -77,6 +87,10 @@ app.component('InputSwitch', InputSwitch)
 app.component('Badge', Badge)
 app.component('FullCalendar', FullCalendar)
 app.component('Chips', Chips)
+app.component('ConfirmDialog', ConfirmDialog)
+app.component('Password', Password)
+app.component('Card', Card)
+app.component('Listbox', Listbox)
 
 app.mount("#app");
 

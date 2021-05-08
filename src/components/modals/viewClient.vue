@@ -33,7 +33,7 @@
         </div>
         <div class="p-col">
           <div class="p-d-flex p-flex-row p-ai-center p-mr-2">
-            <h4>Open Tasks: {{ client.openTasks }}</h4>
+            <h4>Open Tasks: {{ client.openTasks + count }}</h4>
             <Button
               label="Create Task"
               @click="showCreateTask"
@@ -74,6 +74,7 @@
         :visible="createTask"
         :client="client"
         v-on:close="closeCreateTask"
+        v-on:createTask="increaseCount"
       />
       <SendEmail :visible="viewEmail" v-on:close="closeSendEmail" />
       <SendReport :visible="viewReport" v-on:close="closeSendReport" />
@@ -126,6 +127,7 @@ export default {
     let events = ref([]);
     let viewReport = ref(false);
     let viewEmail = ref(false);
+    let count = ref(0);
 
     const options = ref({
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -160,6 +162,10 @@ export default {
         };
       });
     });
+
+    const increaseCount = () => {
+      count.value++;
+    };
 
     const showCreateTask = () => {
       createTask.value = true;
@@ -263,6 +269,8 @@ export default {
       viewSendEmail,
       closeSendEmail,
       viewEmail,
+      count,
+      increaseCount,
     };
   },
 };

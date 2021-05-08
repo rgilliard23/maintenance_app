@@ -114,6 +114,7 @@ export default {
             summary: "Successfully Created Task",
             life: 3000,
           });
+          emit("createdTask");
         })
         .catch((err) => {
           toast.add({

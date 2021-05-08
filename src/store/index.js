@@ -4,6 +4,8 @@ import createPersistedState from 'vuex-persistedstate'
 import * as Cookies from 'js-cookie'
 
 
+import * as emailjs from 'emailjs-com';
+
 export default createStore({
   state: {
     /** @type {firebase.User} */
@@ -15,6 +17,7 @@ export default createStore({
     clients: [],
     client: {},
     tasks: [],
+    userProfile: null,
     doc: "",
   },
   mutations: {
@@ -27,7 +30,14 @@ export default createStore({
       state.user = null
     },
 
-    //* firebase mutations
+
+    setUserProfile(state, payload) {
+      state.userProfile = payload
+    },
+    removeUserProfile(state) {
+      state.userProfile = null
+    },
+
     setFirebaseApp(state, payload) {
       state.firebaseApp = payload
     },
@@ -57,16 +67,50 @@ export default createStore({
   },
   actions: {
 
-    signInAction({ commit }, payload) {
+    signInAction({ commit, state }, payload) {
       firebase.auth().signInWithEmailAndPassword(payload.email, payload.password).then(res => {
         commit('setUser', res.user)
+      }).then(async () => {
+        let db = state.firebaseApp.firestore()
+        let userCollection = db.collection("users")
+        let userRef = userCollection.doc(state.user.uid)
+        let userProfile = await userRef.get().then((doc) => doc.data()).catch(err => {
+          alert(err)
+        })
+        commit('setUserProfile', userProfile)
+        if (userProfile.emailUserID !== null) {
+          console.log("howdy");
+          emailjs.init("user_rC1Q9sVoIa3G5xCq6L6OR");
+        }
       }).catch(err => alert(err))
-
     },
 
-    signUpAction({ commit }, payload) {
+    signUpAction({ commit, state }, payload) {
+
+      let userProfile = {
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        email: payload.email,
+        emailServiceId: null,
+        emailTemplateIds: [],
+        emailUserID: null,
+        showIntro: true,
+      }
+
       firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password).then(res => {
         commit('setUser', res.user)
+        state.firebaseApp.firestore().collection("users").doc(state.user.uid).set({
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          email: payload.email,
+          emailServiceId: null,
+          emailTemplateIds: [],
+          emailUserID: null,
+          showIntro: true,
+        })
+
+        commit('setUserProfile', userProfile)
+
       }).catch(err => alert(err))
     },
 
@@ -141,7 +185,63 @@ export default createStore({
       if (!tasks.empty) {
         context.commit('setTasks', tasks.docs.map(task => task.data()))
       }
+    },
 
+    async deleteClient(context, payload) {
+      let db = context.state.firebaseApp.firestore()
+      let clientCollection = db.collection("clients")
+      let taskQuery = await db.collection("tasks").where('client', '==', payload)
+
+      return new Promise((resolve, reject) => {
+        clientCollection.doc(payload).delete().then(() => { }).then(() => {
+          taskQuery.get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              doc.ref.delete();
+            })
+          }).finally(res => {
+            resolve(res)
+          })
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+
+
+    updateUserProfile({ state, commit }, payload) {
+      let db = state.firebaseApp.firestore()
+      let userCollection = db.collection("users")
+      return new Promise((resolve, reject) => {
+        console.log(payload);
+        userCollection.doc(state.user.uid).set(payload).then(doc => {
+          commit('setUserProfile', payload)
+          resolve(doc)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+
+    sendEmail({ state }, { templateID, emailParams }) {
+      console.log("Howdy");
+      return new Promise((resolve, reject) => {
+        if (state.userProfile.emailServiceId == null || state.userProfile.emailUserId == null || state.userProfile.emailTemplateIds.length == 0) {
+          reject("Please make sure all of the fields related to EmailJS are completed and saved to your profile.")
+          console.log("wgifgwfre");
+        }
+        console.log("Template IDs:" + templateID);
+        console.log("Email Params:" + emailParams);
+        console.log(state.userProfile.emailUserID);
+        emailjs.init(state.userProfile.emailUserID);
+        emailjs.send(state.userProfile.emailServiceId, templateID, emailParams, state.userProfile.emailUserID)
+          .then((result) => {
+            console.log(result);
+            resolve(result)
+          }, (error) => {
+            console.log(error);
+            reject(error)
+          });
+      })
     }
 
   },
@@ -157,6 +257,9 @@ export default createStore({
     },
     tasks(state) {
       return state.tasks
+    },
+    userProfile(state) {
+      return state.userProfile
     }
   },
   modules: {

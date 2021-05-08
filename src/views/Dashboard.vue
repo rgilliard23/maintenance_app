@@ -1,15 +1,13 @@
 <template>
-  <div class="dashboard">
-    <Sidebar />
+  <div class="p-grid p-m-0">
+    <Sidebar class="p-col-3 sidebar p-shadow-4" />
 
     <div v-if="loading" class="loading">
       <ProgressSpinner />
     </div>
 
-    <div class="content">
-      <keep-alive v-if="!loading">
-        <component v-bind:is="currentComponent"></component>
-      </keep-alive>
+    <div class="p-col-9">
+      <component v-bind:is="currentComponent"></component>
     </div>
   </div>
 </template>
@@ -18,6 +16,7 @@
 import Sidebar from "../components/sidebar";
 import Overview from "../components/overview";
 import Clients from "../views/Clients.vue";
+import Profile from "../views/Profile";
 
 import { useStore } from "vuex";
 import { computed, onMounted, ref } from "@vue/runtime-core";
@@ -40,6 +39,7 @@ export default {
 
     onMounted(() => {
       store.dispatch("getClients");
+      store.dispatch("getTasks");
       loading.value = false;
     });
 
@@ -50,6 +50,9 @@ export default {
       if (store.state.currentComponent == "Clients") {
         return Clients;
       }
+      if (store.state.currentComponent == "Profile") {
+        return Profile;
+      }
     });
 
     return { currentComponent, loading };
@@ -57,17 +60,18 @@ export default {
 };
 </script>
 
-<style scoped>
-.dashboard {
+<style lang="scss">
+/* .dashboard {
   display: grid;
   grid-template-columns: 1fr 5fr;
   background-color: #00e0f0;
   height: 100vh;
   width: 100vw;
-}
-.content {
-  background-color: white;
-  border-radius: 20px;
+} */
+
+.sidebar {
+  background-color: var(--primary-color);
+  height: 100vh;
 }
 
 .loading {
@@ -75,6 +79,5 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: white;
 }
 </style>
