@@ -68,6 +68,7 @@
       <ViewTask
         v-on:close="closeViewTask"
         :visible="viewTask"
+        :client="client"
         :task="taskModel"
       />
       <create-task

@@ -72,7 +72,6 @@ import { ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { defineComponent, computed } from "vue";
 import { useToast } from "primevue/usetoast";
-import emailjs from "emailjs-com";
 
 export default defineComponent({
   props: {
@@ -98,20 +97,15 @@ export default defineComponent({
       console.log(emailRecipient.value);
 
       let template = templateID.value;
-      let obj = {
-        templateID: template.templateID,
-        emailParams: {
-          to_email: emailRecipient.value,
-          subject: subject.value,
-          message: message.value,
-        },
+
+      let email = {
+        to_email: emailRecipient.value,
+        subject: subject.value,
+        message: message.value,
       };
-      const serviceID = "default_service";
-      const templateID = "template_71hrmsy";
-      // let userID = userProfile.value.emailUserID;
-      // let serviceID = userProfile.value.serviceID;
-      emailjs
-        .send(serviceID, templateID, obj.emailParams)
+
+      store
+        .dispatch("sendEmail", email)
         .then(() => {
           toast.add({
             severity: "success",
@@ -127,14 +121,6 @@ export default defineComponent({
             life: 3000,
           });
         });
-      // store
-      //   .dispatch("sendEmail", obj)
-      //   .then(() => {
-      //
-      //   })
-      //   .catch((err) => {
-      //
-      //   });
 
       close();
     };

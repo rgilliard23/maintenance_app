@@ -9,10 +9,15 @@ import { onBeforeMount } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import firebase from "firebase/app";
 import { useStore } from "vuex";
-// import NotificationList from "./components/NotificationList.vue";
 
 export default {
   setup() {
+    // const path =
+    //   "../node_modules/primevue/resources/themes/md-dark-indigo/theme.css";
+    // import(path).then((module) => {
+    //   console.log(module);
+    // });
+
     const router = useRouter();
     const route = useRoute();
     const store = useStore();

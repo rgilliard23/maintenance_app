@@ -35,7 +35,9 @@
 </template>
 
 <script>
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
+import FontColor from "@ckeditor/ckeditor5-font/src/fontcolor.js";
+import FontSize from "@ckeditor/ckeditor5-font/src/fontsize.js";
 import { ref } from "@vue/reactivity";
 export default {
   props: {
@@ -45,7 +47,12 @@ export default {
   },
   setup(props, { emit }) {
     let editorData = ref();
-    let editorConfig = ref({});
+    let editorConfig = {
+      plugins: [FontColor, FontSize],
+      toolbar: {
+        items: ["fontSize", "fontColor", "myCustomPlugin"],
+      },
+    };
     let editor = ClassicEditor;
 
     const close = () => {

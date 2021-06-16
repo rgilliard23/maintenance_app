@@ -33,6 +33,8 @@
         <div class="link-container">Profile</div>
       </router-link>
       <InputSwitch class="p-mx-auto" v-model="darkMode" />
+
+      <div v-if="quote">"{{ quote.text }}"</div>
       <div class="side-btn" v-on:click="Logout">
         <div class="link-container">Logout</div>
       </div>
@@ -44,13 +46,13 @@
 import firebase from "firebase/app";
 import { useStore } from "vuex";
 import { ref } from "@vue/reactivity";
-import { onMounted } from "@vue/runtime-core";
+import { onMounted, watch } from "@vue/runtime-core";
 import axios from "axios";
 
 export default {
   setup() {
     const store = useStore();
-    let darkMode = ref(false);
+    let darkMode = ref(true);
     let temperature = ref();
     const Logout = () => {
       firebase
@@ -59,6 +61,21 @@ export default {
         .then((res) => console.log(res))
         .catch((err) => alert(err));
     };
+    const quote = ref();
+
+    watch(darkMode, async () => {
+      if (darkMode.value) {
+        await import("primevue/resources/themes/md-dark-indigo/theme.css");
+        delete require.cache[
+          require.resolve("primevue/resources/themes/md-light-indigo/theme.css")
+        ];
+      } else {
+        await import("primevue/resources/themes/md-light-indigo/theme.css");
+        delete require.cache[
+          require.resolve("primevue/resources/themes/md-dark-indigo/theme.css")
+        ];
+      }
+    });
 
     onMounted(async () => {
       // const url =
@@ -77,19 +94,15 @@ export default {
           console.log(err);
         });
 
-      // const resp = await fetch(
-      //   "api.openweathermap.org/data/2.5/weather?q=London,uk&appid=d82afbee767f9b4274603ec0cc3ca7bd"
-      // ).catch((err) => alert(err));
-
-      // const data = await resp.json();
-
-      // temperature.value = data.main.temp;
+      await axios.get("https://type.fit/api/quotes").then((res) => {
+        quote.value = res.data[Math.floor(Math.random() * res.data.length - 1)];
+      });
     });
 
     const showComponent = (currentComponent) => {
       store.commit("setCurrentComponent", currentComponent);
     };
-    return { Logout, showComponent, darkMode, temperature };
+    return { Logout, showComponent, darkMode, temperature, quote };
   },
 };
 </script>

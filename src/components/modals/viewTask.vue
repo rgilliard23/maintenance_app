@@ -1,3 +1,4 @@
+//
 <template>
   <div>
     <Dialog
@@ -22,6 +23,19 @@
           <label class="my-4" for="lastname">Description</label>
           <Textarea v-model="newTask.description" rows="5" cols="30" />
         </div>
+
+        <div class="p-field">
+          <label class="my-4" for="calendar">Date Created</label>
+          <Calendar
+            label="Date Created"
+            :showTime="true"
+            hourFormat="12"
+            v-model="dateCreated"
+            yearNavigator="true"
+            monthNavigator="true"
+            :showWeek="true"
+          />
+        </div>
         <div class="p-field">
           <label class="my-4" for="calendar">Due Date</label>
           <Calendar
@@ -34,19 +48,6 @@
             :showWeek="true"
           />
         </div>
-        <div class="p-field">
-          <label class="my-4" for="calendar">Due Date</label>
-          <Calendar
-            label="Date Created"
-            :showTime="true"
-            hourFormat="12"
-            v-model="dateCreated"
-            yearNavigator="true"
-            monthNavigator="true"
-            :showWeek="true"
-          />
-        </div>
-
         <div class="my-4 p-field">
           <label for="timeEstimated">Time To Complete</label>
           <InputNumber
@@ -58,6 +59,13 @@
             id="timeToComplete"
           />
         </div>
+        <Dropdown
+          :options="statuses"
+          v-model="newTask.status"
+          optionLabel="status"
+          optionValue="status"
+          placeholder="Set Status"
+        />
       </div>
       <template #footer>
         <Button
@@ -69,20 +77,26 @@
         <Button
           label="Update Task"
           icon="pi pi-check"
-          @click="createTask"
+          @click="updateTask"
           autofocus
         />
       </template>
     </Dialog>
+    <Toast />
   </div>
 </template>
 
 <script>
 import { ref, computed } from "@vue/reactivity";
+import { useStore } from "vuex";
+import { useToast } from "primevue/usetoast";
 // import moment from "moment";
 export default {
   props: {
     visible: {
+      required: true,
+    },
+    client: {
       required: true,
     },
     task: {
@@ -90,6 +104,9 @@ export default {
     },
   },
   setup(props, { emit }) {
+    const store = useStore();
+    const toast = useToast();
+
     let newTask = computed(() => props.task);
     let dateCreated = computed(() => {
       return new Date(props.task.dateCreated.seconds * 1000);
@@ -106,6 +123,40 @@ export default {
       edit.value = true;
     };
 
+    const statuses = [
+      { status: "Open" },
+      { status: "In Progress" },
+      { status: "Completed" },
+    ];
+
+    const updateTask = () => {
+      let updatedTask = {
+        client: newTask.value.client,
+        dateCompleted: newTask.value.dateCompleted,
+        dateDue: newTask.value.dateDue,
+        dateCreated: newTask.value.dateCreated,
+        description: newTask.value.description,
+        header: newTask.value.header,
+        status: newTask.value.status,
+        timeToComplete: newTask.value.timeToComplete,
+        id: newTask.value.id,
+      };
+
+      let obj = {
+        status: updatedTask.status,
+        to_email: props.client.email,
+        task: updatedTask,
+      };
+
+      store.dispatch("updateTask", obj).then(() => {
+        toast.add({
+          severity: "success",
+          summary: "Successfully Updated Task",
+          life: 3000,
+        });
+      });
+    };
+
     return {
       edit,
       newTask,
@@ -113,6 +164,8 @@ export default {
       editTask,
       dateCreated,
       dueDate,
+      statuses,
+      updateTask,
     };
   },
 };

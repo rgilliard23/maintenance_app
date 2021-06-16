@@ -101,7 +101,7 @@ export default {
         dateCreated: firebase.firestore.Timestamp.now(),
         dateCompleted: null,
         timeToComplete: timeToComplete.value,
-        status: "open",
+        status: "Open",
         user: store.getters.user.uid,
         client: props.client.id,
       };

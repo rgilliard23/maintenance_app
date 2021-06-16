@@ -1,9 +1,9 @@
 <template>
-  <div class="register">
+  <div class="p-d-flex p-flex-column p-jc-center" style="height: 100vh">
     <h2 class="title">Register</h2>
     <Card class="p-shadow-4">
       <template #content>
-        <form @submit.prevent="Register">
+        <form @submit.prevent="register">
           <div class="p-field">
             <div class="p-d-flex p-px-4">
               <div class="p-mx-2">
@@ -56,7 +56,7 @@ export default {
     let firstName = ref("");
     let lastName = ref("");
 
-    const Register = () => {
+    const register = () => {
       store.dispatch("signUpAction", {
         email: email.value,
         password: password.value,
@@ -65,47 +65,7 @@ export default {
       });
     };
 
-    return { Register, email, password, firstName, lastName };
+    return { register, email, password, firstName, lastName };
   },
 };
 </script>
-
-<style scoped>
-.register {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: #00e0f0;
-}
-.title {
-  color: white;
-}
-
-.input {
-  margin: 0 50px;
-}
-.card {
-  display: flex;
-  flex-direction: column;
-  /* position: fixed; */
-  /* top: 50%;
-  left: 50%;
-  /* bring your own prefixes */
-  /* transform: translate(-50%, -50%); */
-  height: 500px;
-  width: 500px;
-  background-color: whitesmoke;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-}
-
-h1 {
-  color: red;
-}
-</style>

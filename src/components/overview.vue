@@ -29,6 +29,19 @@
           </template>
         </Card>
       </div>
+      <div class="p-col-12">
+        <Card style="width: 50vw; margin-bottom: 2em">
+          <template #title> Auto Complete </template>
+          <template #content>
+            <AutoComplete
+              v-model="client"
+              :suggestions="filteredClients"
+              field="firstName"
+              @complete="searchClient($event)"
+            />
+          </template>
+        </Card>
+      </div>
     </div>
 
     <Fab class="fab" />
@@ -39,6 +52,7 @@
 import { onMounted, ref } from "@vue/runtime-core";
 import { useStore } from "vuex";
 import Fab from "../components/widgets/fab";
+import { FilterService, FilterMatchMode } from "primevue/api";
 
 export default {
   name: "Overview",
@@ -47,7 +61,9 @@ export default {
   },
   setup() {
     const store = useStore();
+    let client = ref();
     let clients = ref([]);
+    let filteredClients = ref([]);
     let userProfile = ref({});
     let tasks = ref([]);
     onMounted(() => {
@@ -56,7 +72,21 @@ export default {
       tasks.value = store.state.tasks;
     });
 
-    return { clients, tasks };
+    const searchClient = (event) => {
+      setTimeout(() => {
+        if (!event.query.trim().length) {
+          filteredClients.value = [clients.value];
+        } else {
+          filteredClients.value = clients.value.filter((clientTemp) => {
+            return clientTemp.firstName
+              .toLowerCase()
+              .startsWith(event.query.toLowerCase());
+          });
+        }
+      }, 250);
+    };
+
+    return { clients, tasks, client, filteredClients, searchClient };
   },
 };
 </script>

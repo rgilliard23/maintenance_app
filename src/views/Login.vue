@@ -1,11 +1,11 @@
 <template>
-  <div class="login">
+  <div class="p-d-flex p-flex-column p-jc-center" style="height: 100vh">
     <h1 class="title">Login</h1>
     <Card>
       <template #content>
         <form @submit.prevent="Login">
           <div class="p-field">
-            <div class="p-d-flex p-px-4">
+            <div class="p-d-flex p-px-4 p-jc-center">
               <div class="p-mx-2">
                 <h5>Email</h5>
                 <InputText v-model="email" placeholder="Email" />
@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 
 export default {
@@ -46,6 +46,10 @@ export default {
         password: password.value,
       });
     };
+
+    onMounted(async () => {
+      await import("primevue/resources/themes/md-dark-indigo/theme.css");
+    });
 
     return { Login, email, password };
   },
