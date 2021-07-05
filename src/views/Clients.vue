@@ -119,11 +119,9 @@ export default defineComponent({
       { field: "lastName", header: "Last Name" },
       { field: "email", header: "Email" },
     ]);
-    const loading = ref(true);
 
     onBeforeMount(() => {
       clients.value = store.state.clients;
-      loading.value = false;
     });
 
     const showViewClient = (data) => {
@@ -200,7 +198,6 @@ export default defineComponent({
 
     return {
       clients,
-      loading,
       cols,
       showViewClient,
       client,

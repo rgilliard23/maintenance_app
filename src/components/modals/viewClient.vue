@@ -63,6 +63,7 @@
       <ViewAllTasks
         :visible="viewTasks"
         :tasks="tasks"
+        :client="client"
         v-on:closeViewTasks="closeViewTasks"
       />
       <ViewTask
@@ -91,12 +92,12 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { onMounted } from "@vue/runtime-core";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
-import { useStore } from "vuex";
-import moment from "moment";
+// import { useStore } from "vuex";
+// import moment from "moment";
 
 //* Components
 import CreateTask from "../modals/createTask";
-import ViewAllTasks from "../modals/viewAllTasks";
+import ViewAllTasks from "../modals/viewClientTasks";
 import ViewTask from "../modals/viewTask";
 import SendReport from "../modals/sendReport";
 import SendEmail from "../modals/sendEmail";
@@ -118,7 +119,7 @@ export default {
     },
   },
   setup() {
-    let store = useStore();
+    // let store = useStore();
     let createTask = ref(false);
     let tasksLoading = ref(true);
     let viewTask = ref(false);
@@ -146,22 +147,22 @@ export default {
     });
 
     onMounted(async () => {
-      await store.dispatch("getTasks");
-      tasks.value = store.getters.tasks;
-      console.log(tasks.value);
-      tasksLoading.value = false;
-      events.value = tasks.value.map((task) => {
-        return {
-          title: task.header,
-          start: moment
-            .utc(new Date(task.dateCreated.seconds * 1000))
-            .valueOf(),
-          end: moment.utc(new Date(task.dateDue.seconds * 1000)).valueOf(),
-          extendedProps: {
-            task: task,
-          },
-        };
-      });
+      // await store.dispatch("getTasks");
+      // tasks.value = store.getters.tasks;
+      // console.log(tasks.value);
+      // tasksLoading.value = false;
+      // events.value = tasks.value.map((task) => {
+      //   return {
+      //     title: task.header,
+      //     start: moment
+      //       .utc(new Date(task.dateCreated.seconds * 1000))
+      //       .valueOf(),
+      //     end: moment.utc(new Date(task.dateDue.seconds * 1000)).valueOf(),
+      //     extendedProps: {
+      //       task: task,
+      //     },
+      //   };
+      // });
     });
 
     const increaseCount = () => {

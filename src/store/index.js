@@ -224,12 +224,27 @@ export default createStore({
       }
     },
 
+    getTasksFromClient({ state }, payload) {
+      let db = state.firebaseApp.firestore();
+      let tasksCollection = db.collection("tasks");
+
+      return new Promise((resolve, reject) => {
+        tasksCollection
+          .where("id", "==", payload.clientID)
+          .get()
+          .then((res) => {
+            resolve(res);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
+
     async deleteClient(context, payload) {
       let db = context.state.firebaseApp.firestore();
       let clientCollection = db.collection("clients");
-      let taskQuery = await db
-        .collection("tasks")
-        .where("client", "==", payload);
+      let taskQuery = db.collection("tasks").where("client", "==", payload);
 
       return new Promise((resolve, reject) => {
         clientCollection
