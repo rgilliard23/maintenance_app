@@ -13,7 +13,7 @@ import Dropdown from "primevue/dropdown";
 import InputMask from "primevue/inputmask";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
-// import "primevue/resources/themes/md-dark-indigo/theme.css";
+import "primevue/resources/themes/md-dark-indigo/theme.css";
 import "primevue/resources/primevue.min.css";
 import "primeicons/primeicons.css";
 import Sidebar from "primevue/sidebar";
@@ -35,6 +35,7 @@ import Password from "primevue/password";
 import Card from "primevue/card";
 import Listbox from "primevue/listbox";
 import AutoComplete from "primevue/autocomplete";
+import ProgressSpinner from "primevue/progressspinner";
 
 //* Text Editor Import
 import CKEditor from "@ckeditor/ckeditor5-vue";
@@ -87,5 +88,6 @@ app.component("Password", Password);
 app.component("Card", Card);
 app.component("Listbox", Listbox);
 app.component("AutoComplete", AutoComplete);
+app.component("ProgressSpinner", ProgressSpinner);
 
 app.mount("#app");

@@ -21,6 +21,7 @@ export default {
     const router = useRouter();
     const route = useRoute();
     const store = useStore();
+
     onBeforeMount(() => {
       firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
@@ -28,7 +29,6 @@ export default {
         } else if (route.path === "/login" || route.path == "/register") {
           console.log(user);
           store.commit("setUser", user);
-          console.log(user);
           router.replace("/");
           // JZ9MORRDpjlikz3Tzp81sTSmMNkpTaII
         }

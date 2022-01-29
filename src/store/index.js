@@ -18,6 +18,7 @@ export default createStore({
     tasks: [],
     userProfile: null,
     doc: "",
+    workspaces: null,
   },
   mutations: {
     //* user mutations
@@ -81,6 +82,7 @@ export default createStore({
               alert(err);
             });
           commit("setUserProfile", userProfile);
+          console.log(userProfile);
           if (userProfile.emailUserID !== null) {
             console.log("howdy");
             emailjs.init("user_rC1Q9sVoIa3G5xCq6L6OR");

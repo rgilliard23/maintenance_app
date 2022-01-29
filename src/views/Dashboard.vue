@@ -17,6 +17,7 @@ import Sidebar from "../components/sidebar";
 import Overview from "../components/overview";
 import Clients from "../views/Clients.vue";
 import Profile from "../views/Profile";
+import Workspaces from "../views/Workspaces.vue";
 
 import { useStore } from "vuex";
 import { computed, onMounted, ref } from "@vue/runtime-core";
@@ -32,6 +33,7 @@ export default {
     ProgressSpinner,
     Overview,
     Clients,
+    Workspaces,
   },
   setup() {
     const store = useStore();
@@ -52,6 +54,9 @@ export default {
       }
       if (store.state.currentComponent == "Profile") {
         return Profile;
+      }
+      if (store.state.currentComponent == "Workspaces") {
+        return Workspaces;
       }
     });
 

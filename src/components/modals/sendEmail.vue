@@ -96,7 +96,7 @@ export default defineComponent({
     const sendEmail = () => {
       console.log(emailRecipient.value);
 
-      let template = templateID.value;
+      // let template = templateID.value;
 
       let email = {
         to_email: emailRecipient.value,

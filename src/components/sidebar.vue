@@ -25,6 +25,15 @@
       </router-link>
       <router-link
         to="/"
+        @click="showComponent('Workspaces')"
+        active-class="active"
+        tag="button"
+        class="side-btn"
+      >
+        <div class="link-container">Workspaces</div>
+      </router-link>
+      <router-link
+        to="/"
         @click="showComponent('Profile')"
         active-class="active"
         tag="button"
@@ -46,7 +55,7 @@
 import firebase from "firebase/app";
 import { useStore } from "vuex";
 import { ref } from "@vue/reactivity";
-import { onMounted, watch } from "@vue/runtime-core";
+import { onMounted } from "@vue/runtime-core";
 import axios from "axios";
 
 export default {
@@ -63,19 +72,19 @@ export default {
     };
     const quote = ref();
 
-    watch(darkMode, async () => {
-      if (darkMode.value) {
-        await import("primevue/resources/themes/md-dark-indigo/theme.css");
-        delete require.cache[
-          require.resolve("primevue/resources/themes/md-light-indigo/theme.css")
-        ];
-      } else {
-        await import("primevue/resources/themes/md-light-indigo/theme.css");
-        delete require.cache[
-          require.resolve("primevue/resources/themes/md-dark-indigo/theme.css")
-        ];
-      }
-    });
+    // watch(darkMode, async () => {
+    //   if (darkMode.value) {
+    //     await import("primevue/resources/themes/md-dark-indigo/theme.css");
+    //     delete require.cache[
+    //       require.resolve("primevue/resources/themes/md-light-indigo/theme.css")
+    //     ];
+    //   } else {
+    //     await import("primevue/resources/themes/md-light-indigo/theme.css");
+    //     delete require.cache[
+    //       require.resolve("primevue/resources/themes/md-dark-indigo/theme.css")
+    //     ];
+    //   }
+    // });
 
     onMounted(async () => {
       // const url =

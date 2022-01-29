@@ -1,6 +1,12 @@
 <template>
   <div class="p-d-flex p-flex-column p-jc-center" style="height: 100vh">
     <h1 class="title">Login</h1>
+    <h2>Welcome To Ronald's Maintenance Application!</h2>
+    <p>
+      Login Credentials: <br />
+      Username: rgilliard7@gmail.com <br />
+      Password: 123456!
+    </p>
     <Card>
       <template #content>
         <form @submit.prevent="Login">
